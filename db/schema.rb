@@ -10,7 +10,19 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_17_095318) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_17_110709) do
+  create_table "customers", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.text "about"
+    t.text "address"
+    t.datetime "created_at", null: false
+    t.string "name"
+    t.string "phone"
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.string "web"
+    t.index ["user_id"], name: "index_customers_on_user_id"
+  end
+
   create_table "jwt_denylist", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.datetime "exp", null: false
     t.string "jti", null: false
@@ -33,4 +45,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_17_095318) do
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
+
+  add_foreign_key "customers", "users"
 end
