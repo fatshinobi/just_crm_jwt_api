@@ -1,3 +1,3 @@
 class CustomerResource < BaseResource
-  attributes :id, :name
+  attributes :id, :name, :about
 end
