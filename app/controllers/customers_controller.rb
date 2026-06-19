@@ -1,5 +1,4 @@
 class CustomersController < ApplicationController
-  before_action :authenticate_user!
   before_action :set_customer, only: [ :show, :update ]
 
   def index
@@ -22,7 +21,7 @@ class CustomersController < ApplicationController
   private
 
   def customer_params
-    params.require(:customer).permit(:name, :email, :phone, :address, :about)
+    params.require(:customer).permit(:name, :email, :phone, :address, :about, :user_id)
   end
 
   def set_customer

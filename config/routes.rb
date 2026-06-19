@@ -2,6 +2,10 @@ Rails.application.routes.draw do
   resources :customers, only: [ :index, :show, :update ]
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
+  namespace :catalogs do
+    get "users"
+  end
+
   devise_for :users,
     path: "",
     path_names: {
