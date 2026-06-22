@@ -1,6 +1,6 @@
 Rails.application.routes.draw do
-  resources :customers, only: [ :index, :show, :update, :create ]
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
+  resources :customers, except: [ :destroy ]
+  resources :clients, except: [ :destroy ]
 
   namespace :catalogs do
     get "users"
