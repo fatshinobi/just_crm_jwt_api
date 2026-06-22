@@ -18,6 +18,15 @@ class CustomersController < ApplicationController
     end
   end
 
+  def create
+    customer = Customer.new(customer_params)
+    if customer.save
+      render json: CustomerShowResource.new(customer), status: :created
+    else
+      render json: { errors: customer.errors.full_messages }, status: :unprocessable_entity
+    end
+  end
+
   private
 
   def customer_params
