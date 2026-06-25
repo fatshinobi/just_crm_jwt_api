@@ -1,9 +1,11 @@
 Rails.application.routes.draw do
   resources :customers, except: [ :destroy ]
   resources :clients, except: [ :destroy ]
+  resources :client_customers, except: [ :destroy ]
 
   namespace :catalogs do
     get "users"
+    get "clients_by_customer/:customer_id", to: "clients_by_customer"
   end
 
   devise_for :users,
