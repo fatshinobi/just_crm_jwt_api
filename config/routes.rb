@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  get "customers/clients/:customer_id", to: "customers/clients#index"
+
   resources :customers, except: [ :destroy ]
   resources :clients, except: [ :destroy ]
   resources :client_customers, except: [ :destroy ]
