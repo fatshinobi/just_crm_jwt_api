@@ -4,6 +4,6 @@ class Customers::ClientsController < ApplicationController
     records = ClientCustomer.includes(:client).where(customer_id: customer_id)
     clients = ClientCustomerElementResource.new(records)
 
-    render json: clients.to_json, status: :ok
+    render json: clients, status: :ok
   end
 end

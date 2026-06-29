@@ -11,6 +11,13 @@ class CatalogsController < ApplicationController
     render json: clients.to_json, status: :ok
   end
 
+  def customers_by_client
+    client_id = params[:client_id]
+    existed_customers_ids = ClientCustomer.where(client_id: client_id).pluck(:customer_id)
+    customers = list_options_xy(Customer.where.not(id: existed_customers_ids).pluck(:name, :id))
+    render json: customers.to_json, status: :ok
+  end
+
   private
 
   def list_options_xy(array)
