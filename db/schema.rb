@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_08_093812) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_09_180506) do
   create_table "active_storage_attachments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -61,6 +61,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_08_093812) do
     t.index ["user_id"], name: "index_clients_on_user_id"
   end
 
+  create_table "customer_tags", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "customer_id", null: false
+    t.bigint "tag_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["customer_id"], name: "index_customer_tags_on_customer_id"
+    t.index ["tag_id"], name: "index_customer_tags_on_tag_id"
+  end
+
   create_table "customers", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.text "about"
     t.text "address"
@@ -91,6 +100,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_08_093812) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "tags", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "name"
+    t.integer "tag_type"
+    t.datetime "updated_at", null: false
+  end
+
   create_table "users", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "email", default: "", null: false
@@ -109,5 +125,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_08_093812) do
   add_foreign_key "client_customers", "clients"
   add_foreign_key "client_customers", "customers"
   add_foreign_key "clients", "users"
+  add_foreign_key "customer_tags", "customers"
+  add_foreign_key "customer_tags", "tags"
   add_foreign_key "customers", "users"
 end
