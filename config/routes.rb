@@ -3,9 +3,15 @@ Rails.application.routes.draw do
   get "clients/customers/:client_id", to: "clients/customers#index"
   get "roles/:start_str", to: "roles#index"
 
-  resources :customers, except: [ :destroy ]
+  resources :customers, except: [ :destroy ] do
+    member do
+      resources :tags, only: [ :create, :index ], module: :customers
+    end
+  end
+
   resources :clients, except: [ :destroy ]
   resources :client_customers, except: [ :destroy, :index ]
+  resources :customer_tags, only: [ :index ]
 
   namespace :catalogs do
     get "users"
