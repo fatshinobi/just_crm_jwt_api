@@ -5,7 +5,7 @@ class CustomersController < ApplicationController
     tag_val = params[:tag]
     custorers_query = Customer.all
     if tag_val.present?
-      tag_id = Tag.find_by(name: tag_val)&.id
+      tag_id = Tag.find_by(name: tag_val, tag_type: Tag::CUSTOMER_STATUS)&.id
       custorers_query = custorers_query.joins(:customer_tags).where(customer_tags: { tag_id: tag_id }) if tag_id
     end
 

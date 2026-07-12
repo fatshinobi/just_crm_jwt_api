@@ -9,9 +9,15 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :clients, except: [ :destroy ]
+  resources :clients, except: [ :destroy ] do
+    member do
+      resources :tags, only: [ :create, :index ], module: :clients
+    end
+  end
+
   resources :client_customers, except: [ :destroy, :index ]
   resources :customer_tags, only: [ :index ]
+  resources :client_tags, only: [ :index ]
 
   namespace :catalogs do
     get "users"
