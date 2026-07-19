@@ -18,11 +18,14 @@ Rails.application.routes.draw do
   resources :client_customers, except: [ :destroy, :index ]
   resources :customer_tags, only: [ :index ]
   resources :client_tags, only: [ :index ]
+  resources :appointments, except: [ :destroy, :index ]
 
   namespace :catalogs do
     get "users"
     get "clients_by_customer/:customer_id", to: "clients_by_customer"
     get "customers_by_client/:client_id", to: "customers_by_client"
+    get "customers"
+    get "clients_for_customer/:customer_id", to: "clients_for_customer"
   end
 
   devise_for :users,
