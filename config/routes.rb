@@ -6,6 +6,7 @@ Rails.application.routes.draw do
   resources :customers, except: [ :destroy ] do
     member do
       resources :tags, only: [ :create, :index ], module: :customers
+      resources :appointments, only: [ :index ], module: :customers
     end
   end
 
