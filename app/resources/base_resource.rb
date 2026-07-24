@@ -12,8 +12,8 @@ class BaseResource
 
   def format_datetime(value)
     return "" unless value.respond_to?(:strftime)
-
-    value.strftime("%F %T")
+    # show format in "yyyy-MM-ddThh:mm"
+    value.strftime("%Y-%m-%dT%H:%M")
   end
 
   def format_checkbox(value)

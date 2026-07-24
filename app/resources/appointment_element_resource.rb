@@ -12,4 +12,8 @@ class AppointmentElementResource < BaseResource
   attribute :user_name do |appointment|
     appointment.user&.name
   end
+
+  attribute :formatted_when do |appointment|
+    format_datetime(appointment.when)
+  end
 end
