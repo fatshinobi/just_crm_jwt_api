@@ -13,6 +13,7 @@ Rails.application.routes.draw do
   resources :clients, except: [ :destroy ] do
     member do
       resources :tags, only: [ :create, :index ], module: :clients
+      resources :appointments, only: [ :index ], module: :clients
     end
   end
 
@@ -27,6 +28,7 @@ Rails.application.routes.draw do
     get "customers_by_client/:client_id", to: "customers_by_client"
     get "customers"
     get "clients_for_customer/:customer_id", to: "clients_for_customer"
+    get "customers_for_client/:client_id", to: "customers_for_client"
   end
 
   devise_for :users,
