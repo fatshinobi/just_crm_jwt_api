@@ -17,6 +17,12 @@ Rails.application.routes.draw do
     end
   end
 
+  scope :users do
+    resources :appointments, only: [ :index ]
+  end
+
+  get "users/:id/appointments", to: "users/appointments#index"
+
   resources :client_customers, except: [ :destroy, :index ]
   resources :customer_tags, only: [ :index ]
   resources :client_tags, only: [ :index ]
