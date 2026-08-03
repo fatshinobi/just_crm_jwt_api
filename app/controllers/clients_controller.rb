@@ -14,6 +14,8 @@ class ClientsController < ApplicationController
       clients_query = clients_query.where("LOWER(name) LIKE ?", "%#{search_val.downcase}%")
     end
 
+    clients_query = clients_query.includes(:client_tags, :tags)
+
     clients = ClientResource.new(clients_query)
     render json: clients.to_json, status: :ok
   end

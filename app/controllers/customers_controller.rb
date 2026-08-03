@@ -4,17 +4,20 @@ class CustomersController < ApplicationController
   def index
     tag_val = params[:tag]
     search_val = params[:search]
-    custorers_query = Customer.all
+    customers_query = Customer.all
+
     if tag_val.present?
       tag_id = Tag.find_by(name: tag_val, tag_type: Tag::CUSTOMER_STATUS)&.id
-      custorers_query = custorers_query.joins(:customer_tags).where(customer_tags: { tag_id: tag_id }) if tag_id
+      customers_query = customers_query.joins(:customer_tags).where(customer_tags: { tag_id: tag_id }) if tag_id
     end
 
     if search_val.present?
-      custorers_query = custorers_query.where("LOWER(name) LIKE ?", "%#{search_val.downcase}%")
+      customers_query = customers_query.where("LOWER(name) LIKE ?", "%#{search_val.downcase}%")
     end
 
-    customers = CustomerResource.new(custorers_query)
+    customers_query = customers_query.includes(:customer_tags, :tags)
+
+    customers = CustomerResource.new(customers_query)
     render json: customers.to_json, status: :ok
   end
 
