@@ -9,4 +9,8 @@ class ClientResource < BaseResource
       nil
     end
   end
+
+  has_many :tags do
+    attributes :id, :name
+  end
 end
