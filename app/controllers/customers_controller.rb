@@ -18,7 +18,7 @@ class CustomersController < ApplicationController
     customers_query = customers_query.includes(:customer_tags, :tags)
 
     customers = CustomerResource.new(customers_query)
-    render json: customers.to_json, status: :ok
+    render json: customers, status: :ok
   end
 
   def show

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_17_120210) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_03_174034) do
   create_table "active_storage_attachments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -118,6 +118,24 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_17_120210) do
     t.string "jti", null: false
   end
 
+  create_table "opportunities", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.decimal "amount", precision: 8, scale: 2
+    t.bigint "client_id", null: false
+    t.datetime "created_at", null: false
+    t.bigint "customer_id", null: false
+    t.text "description"
+    t.date "finish"
+    t.integer "stage"
+    t.date "start"
+    t.integer "status"
+    t.string "title"
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["client_id"], name: "index_opportunities_on_client_id"
+    t.index ["customer_id"], name: "index_opportunities_on_customer_id"
+    t.index ["user_id"], name: "index_opportunities_on_user_id"
+  end
+
   create_table "roles", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "name"
@@ -157,4 +175,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_17_120210) do
   add_foreign_key "customer_tags", "customers"
   add_foreign_key "customer_tags", "tags"
   add_foreign_key "customers", "users"
+  add_foreign_key "opportunities", "clients"
+  add_foreign_key "opportunities", "customers"
+  add_foreign_key "opportunities", "users"
 end
