@@ -7,6 +7,7 @@ Rails.application.routes.draw do
     member do
       resources :tags, only: [ :create, :index ], module: :customers
       resources :appointments, only: [ :index ], module: :customers
+      resources :opportunities, only: [ :index ], module: :customers
     end
   end
 
