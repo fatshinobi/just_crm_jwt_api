@@ -1,7 +1,7 @@
 class CreateOpportunities < ActiveRecord::Migration[8.1]
   def change
     create_table :opportunities do |t|
-      t.references :client, null: false, foreign_key: true
+      t.references :client, foreign_key: true
       t.references :customer, null: false, foreign_key: true
       t.references :user, null: false, foreign_key: true
       t.string :title
