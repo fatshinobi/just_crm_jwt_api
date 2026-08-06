@@ -1,6 +1,6 @@
 class OpportunityElementResource < BaseResource
   include Rails.application.routes.url_helpers
-  attributes :id, :title, :description, :amount, :stage, :status, :start, :finish, :customer_id, :client_id
+  attributes :id, :title, :description, :amount, :stage, :status, :start, :finish, :customer_id, :client_id, :user_id
 
   attribute :user_name do |record|
     record.user&.name
