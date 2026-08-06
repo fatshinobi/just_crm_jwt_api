@@ -120,7 +120,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_03_174034) do
 
   create_table "opportunities", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.decimal "amount", precision: 8, scale: 2
-    t.bigint "client_id", null: false
+    t.bigint "client_id"
     t.datetime "created_at", null: false
     t.bigint "customer_id", null: false
     t.text "description"
