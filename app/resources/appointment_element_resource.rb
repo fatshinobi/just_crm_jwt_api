@@ -1,5 +1,5 @@
 class AppointmentElementResource < BaseResource
-  attributes :id, :when, :about, :communication_type, :customer_id, :client_id, :user_id, :status
+  attributes :id, :when, :about, :communication_type, :customer_id, :client_id, :user_id, :status, :opportunity_id
 
   attribute :customer_name do |appointment|
     appointment.customer&.name
@@ -11,6 +11,10 @@ class AppointmentElementResource < BaseResource
 
   attribute :user_name do |appointment|
     appointment.user&.name
+  end
+
+  attribute :opportunity_name do |appointment|
+    appointment.opportunity&.title
   end
 
   attribute :formatted_when do |appointment|
