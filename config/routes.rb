@@ -38,6 +38,9 @@ Rails.application.routes.draw do
     get "customers"
     get "clients_for_customer/:customer_id", to: "clients_for_customer"
     get "customers_for_client/:client_id", to: "customers_for_client"
+    get "opportunities_for_customer/:customer_id", to: "opportunities_for_customer"
+    get "opportunities_for_client/:client_id", to: "opportunities_for_client"
+    get "opportunities_for_client_customer/:client_id/:customer_id", to: "opportunities_for_client_customer"
   end
 
   devise_for :users,

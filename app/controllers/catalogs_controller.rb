@@ -32,6 +32,28 @@ class CatalogsController < ApplicationController
     render json: customers.to_json, status: :ok
   end
 
+  def opportunities_for_customer
+    customer_id = params[:customer_id]
+    records = Opportunity.where(customer_id: customer_id).pluck(:title, :id)
+    opportunities = list_options_xy(records)
+    render json: opportunities.to_json, status: :ok
+  end
+
+  def opportunities_for_client
+    client_id = params[:client_id]
+    records = Opportunity.where(client_id: client_id).pluck(:title, :id)
+    opportunities = list_options_xy(records)
+    render json: opportunities.to_json, status: :ok
+  end
+
+  def opportunities_for_client_customer
+    client_id = params[:client_id]
+    customer_id = params[:customer_id]
+    records = Opportunity.where(client_id: client_id, customer_id: customer_id).pluck(:title, :id)
+    opportunities = list_options_xy(records)
+    render json: opportunities.to_json, status: :ok
+  end
+
   def customers
     customers = list_options_xy(Customer.pluck(:name, :id))
     render json: customers.to_json, status: :ok
