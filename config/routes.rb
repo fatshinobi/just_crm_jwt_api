@@ -29,7 +29,9 @@ Rails.application.routes.draw do
   resources :customer_tags, only: [ :index ]
   resources :client_tags, only: [ :index ]
   resources :appointments, except: [ :destroy, :index ]
-  resources :opportunities, except: [ :destroy ]
+  resources :opportunities, except: [ :destroy ] do
+    resources :appointments, only: [ :index ], module: :opportunities
+  end
 
   namespace :catalogs do
     get "users"
