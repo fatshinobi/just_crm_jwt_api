@@ -13,4 +13,8 @@ class OpportunityElementResource < BaseResource
   attribute :client_name do |record|
     record.client&.name
   end
+
+  has_many :tags do
+    attributes :id, :name
+  end
 end

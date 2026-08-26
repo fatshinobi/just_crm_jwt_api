@@ -4,6 +4,8 @@ class OpportunitiesController < ApplicationController
   def index
     opportunities = Opportunity.all
 
+    opportunities = opportunities.includes(:opportunity_tags, :tags)
+
     records = OpportunityElementResource.new(opportunities)
     render json: records, status: :ok
   end

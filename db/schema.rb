@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_18_093106) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_26_173449) do
   create_table "active_storage_attachments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -138,6 +138,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_18_093106) do
     t.index ["user_id"], name: "index_opportunities_on_user_id"
   end
 
+  create_table "opportunity_tags", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "opportunity_id", null: false
+    t.bigint "tag_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["opportunity_id"], name: "index_opportunity_tags_on_opportunity_id"
+    t.index ["tag_id"], name: "index_opportunity_tags_on_tag_id"
+  end
+
   create_table "roles", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "name"
@@ -181,4 +190,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_18_093106) do
   add_foreign_key "opportunities", "clients"
   add_foreign_key "opportunities", "customers"
   add_foreign_key "opportunities", "users"
+  add_foreign_key "opportunity_tags", "opportunities"
+  add_foreign_key "opportunity_tags", "tags"
 end
