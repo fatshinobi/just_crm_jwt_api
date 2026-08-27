@@ -30,7 +30,10 @@ Rails.application.routes.draw do
   resources :client_tags, only: [ :index ]
   resources :appointments, except: [ :destroy, :index ]
   resources :opportunities, except: [ :destroy ] do
-    resources :appointments, only: [ :index ], module: :opportunities
+    member do
+      resources :appointments, only: [ :index ], module: :opportunities
+      resources :tags, only: [ :index ], module: :opportunities
+    end
   end
 
   namespace :catalogs do
