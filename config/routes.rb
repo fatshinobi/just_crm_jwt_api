@@ -28,11 +28,12 @@ Rails.application.routes.draw do
   resources :client_customers, except: [ :destroy, :index ]
   resources :customer_tags, only: [ :index ]
   resources :client_tags, only: [ :index ]
+  resources :opportunity_tags, only: [ :index ]
   resources :appointments, except: [ :destroy, :index ]
   resources :opportunities, except: [ :destroy ] do
     member do
       resources :appointments, only: [ :index ], module: :opportunities
-      resources :tags, only: [ :index ], module: :opportunities
+      resources :tags, only: [ :create, :index ], module: :opportunities
     end
   end
 
