@@ -2,7 +2,13 @@ class OpportunitiesController < ApplicationController
   before_action :set_opportunity, only: [ :show, :update ]
 
   def index
+    tag_val = params[:tag]
     opportunities = Opportunity.all
+
+    if tag_val.present?
+      tag_id = Tag.find_by(name: tag_val, tag_type: Tag::OPPORTUNITY_STATUS)&.id
+      opportunities = opportunities.joins(:opportunity_tags).where(opportunity_tags: { tag_id: tag_id }) if tag_id
+    end
 
     opportunities = opportunities.includes(:opportunity_tags, :tags)
 
