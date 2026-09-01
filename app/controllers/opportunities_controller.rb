@@ -44,6 +44,11 @@ class OpportunitiesController < ApplicationController
     end
   end
 
+  def by_stages
+    stages = Opportunity.group(:stage).count
+    render json: stages, status: :ok
+  end
+
   private
 
   def set_opportunity

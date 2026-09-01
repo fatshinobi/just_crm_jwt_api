@@ -35,6 +35,9 @@ Rails.application.routes.draw do
       resources :appointments, only: [ :index ], module: :opportunities
       resources :tags, only: [ :create, :index ], module: :opportunities
     end
+    collection do
+      get "by_stages"
+    end
   end
 
   namespace :catalogs do
