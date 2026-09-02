@@ -4,6 +4,7 @@ class OpportunitiesController < ApplicationController
   def index
     tag_val = params[:tag]
     search_val = params[:search]
+    stage_val = params[:stage]
     opportunities = Opportunity.all
 
     if tag_val.present?
@@ -13,6 +14,10 @@ class OpportunitiesController < ApplicationController
 
     if search_val.present?
       opportunities = opportunities.where("LOWER(title) LIKE ?", "%#{search_val.downcase}%")
+    end
+
+    if stage_val.present?
+      opportunities = opportunities.where(stage: stage_val)
     end
 
     opportunities = opportunities.includes(:opportunity_tags, :tags)
