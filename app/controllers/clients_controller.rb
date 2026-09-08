@@ -1,5 +1,5 @@
 class ClientsController < ApplicationController
-  before_action :set_client, only: [ :show, :update ]
+  before_action :set_client, only: [ :show, :update, :destroy ]
   def index
     tag_val = params[:tag]
     search_val = params[:search]
@@ -36,6 +36,14 @@ class ClientsController < ApplicationController
   def update
     if @client.update(client_params)
       render json: ClientShowResource.new(@client).to_json, status: :ok
+    else
+      render json: { errors: @client.errors.full_messages }, status: :unprocessable_entity
+    end
+  end
+
+  def destroy
+    if @client.destroy
+      head :no_content
     else
       render json: { errors: @client.errors.full_messages }, status: :unprocessable_entity
     end
