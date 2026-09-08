@@ -1,4 +1,5 @@
 class Customer < ApplicationRecord
+  acts_as_paranoid
   has_one_attached :avatar
   belongs_to :user
   has_many :customer_tags
