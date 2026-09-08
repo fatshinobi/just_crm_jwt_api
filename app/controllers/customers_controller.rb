@@ -1,5 +1,5 @@
 class CustomersController < ApplicationController
-  before_action :set_customer, only: [ :show, :update ]
+  before_action :set_customer, only: [ :show, :update, :destroy ]
 
   def index
     tag_val = params[:tag]
@@ -39,6 +39,14 @@ class CustomersController < ApplicationController
       render json: CustomerShowResource.new(customer), status: :created
     else
       render json: { errors: customer.errors.full_messages }, status: :unprocessable_entity
+    end
+  end
+
+  def destroy
+    if @customer.destroy
+      head :no_content
+    else
+      render json: { errors: @customer.errors.full_messages }, status: :unprocessable_entity
     end
   end
 

@@ -3,7 +3,7 @@ Rails.application.routes.draw do
   get "clients/customers/:client_id", to: "clients/customers#index"
   get "roles/:start_str", to: "roles#index"
 
-  resources :customers, except: [ :destroy ] do
+  resources :customers do
     member do
       resources :tags, only: [ :create, :index ], module: :customers
       resources :appointments, only: [ :index ], module: :customers
