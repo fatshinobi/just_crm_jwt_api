@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_08_182749) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_08_191712) do
   create_table "active_storage_attachments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -78,12 +78,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_08_182749) do
   create_table "clients", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.text "about"
     t.datetime "created_at", null: false
+    t.datetime "deleted_at"
     t.string "email"
     t.string "name"
     t.string "phone"
     t.string "social"
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
+    t.index ["deleted_at"], name: "index_clients_on_deleted_at"
     t.index ["user_id"], name: "index_clients_on_user_id"
   end
 

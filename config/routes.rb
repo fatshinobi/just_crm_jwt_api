@@ -11,7 +11,7 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :clients, except: [ :destroy ] do
+  resources :clients do
     member do
       resources :tags, only: [ :create, :index ], module: :clients
       resources :appointments, only: [ :index ], module: :clients
