@@ -1,5 +1,5 @@
 class OpportunitiesController < ApplicationController
-  before_action :set_opportunity, only: [ :show, :update ]
+  before_action :set_opportunity, only: [ :show, :update, :destroy ]
 
   def index
     tag_val = params[:tag]
@@ -52,6 +52,14 @@ class OpportunitiesController < ApplicationController
   def by_stages
     stages = Opportunity.group(:stage).count
     render json: stages, status: :ok
+  end
+
+  def destroy
+    if @opportunity.destroy
+      head :no_content
+    else
+      render json: { errors: @opportunity.errors.full_messages }, status: :unprocessable_entity
+    end
   end
 
   private
