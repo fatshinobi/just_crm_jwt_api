@@ -1,4 +1,5 @@
 class Opportunity < ApplicationRecord
+  acts_as_paranoid
   belongs_to :client, optional: true
   belongs_to :customer
   belongs_to :user

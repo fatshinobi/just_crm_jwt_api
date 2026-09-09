@@ -30,7 +30,7 @@ Rails.application.routes.draw do
   resources :client_tags, only: [ :index ]
   resources :opportunity_tags, only: [ :index ]
   resources :appointments, except: [ :destroy, :index ]
-  resources :opportunities, except: [ :destroy ] do
+  resources :opportunities do
     member do
       resources :appointments, only: [ :index ], module: :opportunities
       resources :tags, only: [ :create, :index ], module: :opportunities
