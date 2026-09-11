@@ -1,5 +1,5 @@
 class AppointmentsController < ApplicationController
-  before_action :set_appointment, only: [ :show, :update ]
+  before_action :set_appointment, only: [ :show, :update, :destroy ]
 
   def create
     appointment = Appointment.new(appointment_params)
@@ -18,6 +18,14 @@ class AppointmentsController < ApplicationController
   def update
     if @appointment.update(appointment_params)
       render json: AppointmentResource.new(@appointment), status: :ok
+    else
+      render json: { errors: @appointment.errors.full_messages }, status: :unprocessable_entity
+    end
+  end
+
+  def destroy
+    if @appointment.destroy
+      head :no_content
     else
       render json: { errors: @appointment.errors.full_messages }, status: :unprocessable_entity
     end
