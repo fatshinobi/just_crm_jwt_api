@@ -1,5 +1,6 @@
 class ClientCustomersController < ApplicationController
-  before_action :set_client, only: [ :show, :update ]
+  before_action :set_client, only: [ :show, :update, :destroy ]
+
   def create
     client_customer = ClientCustomer.new(client_customer_params)
     if client_customer.save
@@ -22,6 +23,14 @@ class ClientCustomersController < ApplicationController
 
   def show
     render json: ClientCustomerResource.new(@client_customer), status: :ok
+  end
+
+  def destroy
+    if @client_customer.destroy
+      head :no_content
+    else
+      render json: { errors: @client_customer.errors.full_messages }, status: :unprocessable_entity
+    end
   end
 
   private
