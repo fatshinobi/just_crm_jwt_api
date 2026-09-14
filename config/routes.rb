@@ -25,7 +25,7 @@ Rails.application.routes.draw do
 
   get "users/:id/appointments", to: "users/appointments#index"
 
-  resources :client_customers, except: [ :destroy, :index ]
+  resources :client_customers, except: [ :index ]
   resources :customer_tags, only: [ :index ]
   resources :client_tags, only: [ :index ]
   resources :opportunity_tags, only: [ :index ]
