@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_11_172421) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_15_084012) do
   create_table "active_storage_attachments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -56,6 +56,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_11_172421) do
     t.index ["deleted_at"], name: "index_appointments_on_deleted_at"
     t.index ["opportunity_id"], name: "index_appointments_on_opportunity_id"
     t.index ["user_id"], name: "index_appointments_on_user_id"
+  end
+
+  create_table "attachments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.integer "attachable_id"
+    t.string "attachable_type"
+    t.integer "attachment_type", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.string "description"
+    t.datetime "updated_at", null: false
   end
 
   create_table "client_customers", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
