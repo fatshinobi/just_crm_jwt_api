@@ -1,15 +1,19 @@
 Rails.application.routes.draw do
   get "customers/clients/:customer_id", to: "customers/clients#index"
   get "clients/customers/:client_id", to: "clients/customers#index"
-  get "customers/attachments/:customer_id", to: "customers/attachments#index"
   get "roles/:start_str", to: "roles#index"
+
+  resources :customers do
+    collection do
+      resources :attachments, only: [ :index, :create ], module: :customers, path: "attachments/:customer_id"
+    end
+  end
 
   resources :customers do
     member do
       resources :tags, only: [ :create, :index ], module: :customers
       resources :appointments, only: [ :index ], module: :customers
       resources :opportunities, only: [ :index ], module: :customers
-      resources :attachments, only: [ :index ], module: :customers
     end
   end
 
