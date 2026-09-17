@@ -18,6 +18,22 @@ class Customers::AttachmentsController < ApplicationController
     end
   end
 
+  def update
+    attachment = Attachment.find(params[:id])
+
+    if attachment.update(description: params[:description])
+      render json: { message: "Attachment updated successfully" }, status: :ok
+    else
+      render json: { errors: attachment.errors.full_messages }, status: :unprocessable_entity
+    end
+  end
+
+  def show
+    attachment_rec = Attachment.find(params[:id])
+    attachment = ClientAttachmentElementResource.new(attachment_rec)
+    render json: attachment, status: :ok
+  end
+
   private
 
   def set_customer
