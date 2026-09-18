@@ -1,5 +1,6 @@
 class Customers::AttachmentsController < ApplicationController
   before_action :set_customer, only: [ :index, :create ]
+  before_action :set_attachment, only: [ :show, :update, :destroy ]
 
   def index
     records = Attachment.where(attachable: @customer)
@@ -19,19 +20,24 @@ class Customers::AttachmentsController < ApplicationController
   end
 
   def update
-    attachment = Attachment.find(params[:id])
-
-    if attachment.update(description: params[:description])
+    if @attachment.update(description: params[:description])
       render json: { message: "Attachment updated successfully" }, status: :ok
     else
-      render json: { errors: attachment.errors.full_messages }, status: :unprocessable_entity
+      render json: { errors: @attachment.errors.full_messages }, status: :unprocessable_entity
     end
   end
 
   def show
-    attachment_rec = Attachment.find(params[:id])
-    attachment = ClientAttachmentElementResource.new(attachment_rec)
-    render json: attachment, status: :ok
+    attachment_rec = ClientAttachmentElementResource.new(@attachment)
+    render json: attachment_rec, status: :ok
+  end
+
+  def destroy
+    if @attachment.destroy
+      head :no_content
+    else
+      render json: { errors: @attachment.errors.full_messages }, status: :unprocessable_entity
+    end
   end
 
   private
@@ -39,6 +45,10 @@ class Customers::AttachmentsController < ApplicationController
   def set_customer
     customer_id = params[:customer_id]
     @customer = Customer.find(customer_id)
+  end
+
+  def set_attachment
+    @attachment = Attachment.find(params[:id])
   end
 
   def define_attachment_type

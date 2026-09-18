@@ -5,7 +5,7 @@ Rails.application.routes.draw do
 
   resources :customers do
     collection do
-      resources :attachments, only: [ :index, :create, :update, :show ], module: :customers, path: "attachments/:customer_id"
+      resources :attachments, module: :customers, path: "attachments/:customer_id"
     end
   end
 
