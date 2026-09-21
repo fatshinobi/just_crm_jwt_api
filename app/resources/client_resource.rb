@@ -4,7 +4,7 @@ class ClientResource < BaseResource
 
   attribute :avatar_url do |client|
     if client.avatar.attached?
-      rails_blob_url(client.avatar, only_path: false)
+      rails_blob_url(client.avatar, only_path: true)
     else
       nil
     end
