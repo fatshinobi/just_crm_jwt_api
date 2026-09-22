@@ -9,6 +9,12 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :clients do
+    collection do
+      resources :attachments, module: :clients, path: "attachments/:client_id"
+    end
+  end
+
   resources :customers do
     member do
       resources :tags, only: [ :create, :index ], module: :customers
