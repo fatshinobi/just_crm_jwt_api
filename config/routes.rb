@@ -15,6 +15,12 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :opportunities do
+    collection do
+      resources :attachments, module: :opportunities, path: "attachments/:opportunity_id"
+    end
+  end
+
   resources :customers do
     member do
       resources :tags, only: [ :create, :index ], module: :customers
