@@ -21,6 +21,12 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :appointments do
+    collection do
+      resources :attachments, module: :appointments, path: "attachments/:appointment_id"
+    end
+  end
+
   resources :customers do
     member do
       resources :tags, only: [ :create, :index ], module: :customers
