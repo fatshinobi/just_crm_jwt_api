@@ -18,6 +18,7 @@ Rails.application.routes.draw do
   resources :opportunities do
     collection do
       resources :attachments, module: :opportunities, path: "attachments/:opportunity_id"
+      get "by_stages"
     end
   end
 
@@ -58,9 +59,6 @@ Rails.application.routes.draw do
     member do
       resources :appointments, only: [ :index ], module: :opportunities
       resources :tags, only: [ :create, :index ], module: :opportunities
-    end
-    collection do
-      get "by_stages"
     end
   end
 
