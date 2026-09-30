@@ -3,14 +3,12 @@ require "rails_helper"
 RSpec.describe "CustomersController", type: :request do
   describe "GET /customers" do
     let!(:user) { create(:user) }
-    let!(:customer) { create(:customer, user: user) }
     let!(:tag) { create(:tag, name: "VIP", tag_type: Tag::CUSTOMER_STATUS) }
+    let!(:customer) { create(:customer, user: user) }
     let!(:other_customer) { create(:customer, user: user, name: "Other Co") }
+    let!(:customer_tag) { create(:customer_tag, customer: customer, tag: tag) }
 
-    before do
-      customer.tags << tag
-      sign_in user
-    end
+    before { sign_in user }
 
     it "returns all customers serialized with CustomerResource" do
       get "/customers",
