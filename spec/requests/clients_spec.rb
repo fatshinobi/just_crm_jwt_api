@@ -134,7 +134,7 @@ RSpec.describe "ClientsController", type: :request do
           params: { name: nil, email: nil, user_id: nil }.to_json,
           headers: { "Accept" => "application/json", "Content-Type" => "application/json" }
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
 
         json = JSON.parse(response.body)
         expect(json["errors"]).to be_an(Array)
