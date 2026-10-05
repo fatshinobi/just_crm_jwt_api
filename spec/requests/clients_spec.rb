@@ -104,4 +104,41 @@ RSpec.describe "ClientsController", type: :request do
       end
     end
   end
+
+  describe "POST /clients" do
+    let!(:user) { create(:user) }
+
+    before { sign_in user }
+
+    it "creates a client and returns the serialized response with ClientShowResource" do
+      post "/clients",
+        params: { name: "New Client", email: "newclient@example.com", phone: "555-9999", social: "@newclient", about: "A new client", user_id: user.id }.to_json,
+        headers: { "Accept" => "application/json", "Content-Type" => "application/json" }
+
+      expect(response).to have_http_status(:created)
+
+      json = JSON.parse(response.body)
+
+      expect(json["name"]).to eq("New Client")
+      expect(json["email"]).to eq("newclient@example.com")
+      expect(json["phone"]).to eq("555-9999")
+      expect(json["social"]).to eq("@newclient")
+      expect(json["about"]).to eq("A new client")
+      expect(json["user_id"]).to eq(user.id)
+      expect(json["user_name"]).to eq(user.name)
+    end
+
+    context "when required params are missing" do
+      it "returns 422 with errors" do
+        post "/clients",
+          params: { name: nil, email: nil, user_id: nil }.to_json,
+          headers: { "Accept" => "application/json", "Content-Type" => "application/json" }
+
+        expect(response).to have_http_status(:unprocessable_entity)
+
+        json = JSON.parse(response.body)
+        expect(json["errors"]).to be_an(Array)
+      end
+    end
+  end
 end
