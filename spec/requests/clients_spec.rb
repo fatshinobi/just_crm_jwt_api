@@ -141,4 +141,42 @@ RSpec.describe "ClientsController", type: :request do
       end
     end
   end
+
+  describe "PATCH /clients/:id" do
+    let!(:user) { create(:user) }
+    let!(:client) { create(:client, user: user, name: "Original Name", about: "Original about") }
+
+    before { sign_in user }
+
+    it "updates the client and returns the serialized response with ClientShowResource" do
+      patch "/clients/#{client.id}",
+        params: { name: "Updated Name", about: "Updated about", email: "updated@example.com" }.to_json,
+        headers: { "Accept" => "application/json", "Content-Type" => "application/json" }
+
+      expect(response).to have_http_status(:ok)
+
+      json = JSON.parse(response.body)
+
+      expect(json["id"]).to eq(client.id)
+      expect(json["name"]).to eq("Updated Name")
+      expect(json["about"]).to eq("Updated about")
+      expect(json["email"]).to eq("updated@example.com")
+      expect(json["user_id"]).to eq(user.id)
+      expect(json["user_name"]).to eq(user.name)
+
+      client.reload
+      expect(client.name).to eq("Updated Name")
+      expect(client.about).to eq("Updated about")
+    end
+
+    context "when client does not exist" do
+      it "returns 404" do
+        patch "/clients/999999",
+          params: { name: "Updated Name" }.to_json,
+          headers: { "Accept" => "application/json", "Content-Type" => "application/json" }
+
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+  end
 end
