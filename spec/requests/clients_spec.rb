@@ -179,4 +179,30 @@ RSpec.describe "ClientsController", type: :request do
       end
     end
   end
+
+  describe "DELETE /clients/:id" do
+    let!(:user) { create(:user) }
+    let!(:client) { create(:client, user: user) }
+
+    before { sign_in user }
+
+    it "soft-deletes the client and returns 204" do
+      delete "/clients/#{client.id}",
+        headers: { "Accept" => "application/json", "Content-Type" => "application/json" }
+
+      expect(response).to have_http_status(:no_content)
+
+      client.reload
+      expect(client.deleted_at).not_to be_nil
+    end
+
+    context "when client does not exist" do
+      it "returns 404" do
+        delete "/clients/999999",
+          headers: { "Accept" => "application/json", "Content-Type" => "application/json" }
+
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+  end
 end
