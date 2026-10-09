@@ -67,4 +67,37 @@ RSpec.describe "Clients::AttachmentsController", type: :request do
       end
     end
   end
+
+  describe "GET /clients/attachments/:client_id/:id" do
+    let!(:user) { create(:user) }
+    let!(:client) { create(:client, user: user) }
+    let!(:attachment) { create(:attachment, attachable: client, description: "Single attachment") }
+
+    before { sign_in user }
+
+    it "returns the attachment serialized with ClientAttachmentElementResource" do
+      get "/clients/attachments/#{client.id}/#{attachment.id}",
+        headers: { "Accept" => "application/json", "Content-Type" => "application/json" }
+
+      expect(response).to have_http_status(:ok)
+
+      json = JSON.parse(response.body)
+
+      expect(json["id"]).to eq(attachment.id)
+      expect(json["description"]).to eq("Single attachment")
+      expect(json["attachment_type"]).to eq(attachment.attachment_type)
+      expect(json["customer_id"]).to eq(client.id)
+      expect(json["uploaded_file_name"]).to be_nil
+      expect(json["uploaded_file_url"]).to be_nil
+    end
+
+    context "when attachment does not exist" do
+      it "returns 404" do
+        get "/clients/attachments/#{client.id}/999999",
+          headers: { "Accept" => "application/json", "Content-Type" => "application/json" }
+
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+  end
 end
