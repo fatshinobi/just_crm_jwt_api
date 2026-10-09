@@ -100,4 +100,51 @@ RSpec.describe "Clients::AttachmentsController", type: :request do
       end
     end
   end
+
+  describe "POST /clients/attachments/:client_id" do
+    let!(:user) { create(:user) }
+    let!(:client) { create(:client, user: user) }
+
+    before { sign_in user }
+
+    it "creates an attachment and returns 201" do
+      post "/clients/attachments/#{client.id}",
+        params: { description: "New attachment" }.to_json,
+        headers: { "Accept" => "application/json", "Content-Type" => "application/json" }
+
+      expect(response).to have_http_status(:created)
+
+      json = JSON.parse(response.body)
+      expect(json["message"]).to eq("Attachment created successfully")
+
+      attachment = Attachment.find_by(attachable: client, description: "New attachment")
+      expect(attachment).not_to be_nil
+    end
+
+    context "when description is missing" do
+      it "returns 422 with errors" do
+        allow_any_instance_of(Attachment).to receive(:save).and_return(false)
+        allow_any_instance_of(Attachment).to receive_message_chain(:errors, :full_messages).and_return([ "Description can't be blank" ])
+
+        post "/clients/attachments/#{client.id}",
+          params: { description: nil }.to_json,
+          headers: { "Accept" => "application/json", "Content-Type" => "application/json" }
+
+        expect(response).to have_http_status(:unprocessable_content)
+
+        json = JSON.parse(response.body)
+        expect(json["errors"]).to be_an(Array)
+      end
+    end
+
+    context "when client does not exist" do
+      it "returns 404" do
+        post "/clients/attachments/999999",
+          params: { description: "New attachment" }.to_json,
+          headers: { "Accept" => "application/json", "Content-Type" => "application/json" }
+
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+  end
 end
