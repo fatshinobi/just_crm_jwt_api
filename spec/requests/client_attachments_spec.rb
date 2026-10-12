@@ -147,4 +147,52 @@ RSpec.describe "Clients::AttachmentsController", type: :request do
       end
     end
   end
+
+  describe "PATCH /clients/attachments/:client_id/:id" do
+    let!(:user) { create(:user) }
+    let!(:client) { create(:client, user: user) }
+    let!(:attachment) { create(:attachment, attachable: client, description: "Original description") }
+
+    before { sign_in user }
+
+    it "updates the attachment description and returns 200" do
+      patch "/clients/attachments/#{client.id}/#{attachment.id}",
+        params: { description: "Updated description" }.to_json,
+        headers: { "Accept" => "application/json", "Content-Type" => "application/json" }
+
+      expect(response).to have_http_status(:ok)
+
+      json = JSON.parse(response.body)
+      expect(json["message"]).to eq("Attachment updated successfully")
+
+      attachment.reload
+      expect(attachment.description).to eq("Updated description")
+    end
+
+    context "when update fails" do
+      it "returns 422 with errors" do
+        allow_any_instance_of(Attachment).to receive(:update).and_return(false)
+        allow_any_instance_of(Attachment).to receive_message_chain(:errors, :full_messages).and_return([ "Description can't be blank" ])
+
+        patch "/clients/attachments/#{client.id}/#{attachment.id}",
+          params: { description: "" }.to_json,
+          headers: { "Accept" => "application/json", "Content-Type" => "application/json" }
+
+        expect(response).to have_http_status(:unprocessable_content)
+
+        json = JSON.parse(response.body)
+        expect(json["errors"]).to be_an(Array)
+      end
+    end
+
+    context "when attachment does not exist" do
+      it "returns 404" do
+        patch "/clients/attachments/#{client.id}/999999",
+          params: { description: "Updated description" }.to_json,
+          headers: { "Accept" => "application/json", "Content-Type" => "application/json" }
+
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+  end
 end
