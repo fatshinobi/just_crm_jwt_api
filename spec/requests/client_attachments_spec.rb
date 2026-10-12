@@ -195,4 +195,45 @@ RSpec.describe "Clients::AttachmentsController", type: :request do
       end
     end
   end
+
+  describe "DELETE /clients/attachments/:client_id/:id" do
+    let!(:user) { create(:user) }
+    let!(:client) { create(:client, user: user) }
+    let!(:attachment) { create(:attachment, attachable: client, description: "Attachment to delete") }
+
+    before { sign_in user }
+
+    it "deletes the attachment and returns 204" do
+      delete "/clients/attachments/#{client.id}/#{attachment.id}",
+        headers: { "Accept" => "application/json", "Content-Type" => "application/json" }
+
+      expect(response).to have_http_status(:no_content)
+
+      expect(Attachment.find_by(id: attachment.id)).to be_nil
+    end
+
+    context "when destroy fails" do
+      it "returns 422 with errors" do
+        allow_any_instance_of(Attachment).to receive(:destroy).and_return(false)
+        allow_any_instance_of(Attachment).to receive_message_chain(:errors, :full_messages).and_return([ "Cannot delete attachment" ])
+
+        delete "/clients/attachments/#{client.id}/#{attachment.id}",
+          headers: { "Accept" => "application/json", "Content-Type" => "application/json" }
+
+        expect(response).to have_http_status(:unprocessable_entity)
+
+        json = JSON.parse(response.body)
+        expect(json["errors"]).to be_an(Array)
+      end
+    end
+
+    context "when attachment does not exist" do
+      it "returns 404" do
+        delete "/clients/attachments/#{client.id}/999999",
+          headers: { "Accept" => "application/json", "Content-Type" => "application/json" }
+
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+  end
 end
