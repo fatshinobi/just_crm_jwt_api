@@ -87,5 +87,23 @@ RSpec.describe "OpportunitiesController", type: :request do
         expect(ids).not_to include(opportunity.id)
       end
     end
+
+    context "when filtering by stage" do
+      let!(:staged_opportunity) { create(:opportunity, customer: customer, user: user, title: "Staged Deal", stage: 2) }
+
+      it "returns only opportunities with the matching stage" do
+        get "/opportunities?stage=2",
+          headers: { "Accept" => "application/json", "Content-Type" => "application/json" }
+
+        expect(response).to have_http_status(:ok)
+
+        json = JSON.parse(response.body)
+        ids = json.map { |o| o["id"] }
+
+        expect(ids).to include(staged_opportunity.id)
+        expect(ids).not_to include(opportunity.id)
+        expect(ids).not_to include(other_opportunity.id)
+      end
+    end
   end
 end
