@@ -143,4 +143,57 @@ RSpec.describe "OpportunitiesController", type: :request do
       end
     end
   end
+
+  describe "POST /opportunities" do
+    let!(:user) { create(:user) }
+    let!(:customer) { create(:customer, user: user) }
+
+    before { sign_in user }
+
+    it "creates an opportunity and returns the serialized response with OpportunityElementResource" do
+      post "/opportunities",
+        params: {
+          title: "New Opportunity",
+          description: "A new opportunity",
+          amount: 7500.00,
+          stage: 0,
+          status: 0,
+          start: "2024-01-01",
+          finish: "2024-12-31",
+          customer_id: customer.id,
+          user_id: user.id
+        }.to_json,
+        headers: { "Accept" => "application/json", "Content-Type" => "application/json" }
+
+      expect(response).to have_http_status(:created)
+
+      json = JSON.parse(response.body)
+
+      expect(json["title"]).to eq("New Opportunity")
+      expect(json["description"]).to eq("A new opportunity")
+      expect(json["amount"]).to eq("7500.0")
+      expect(json["stage"]).to eq(0)
+      expect(json["status"]).to eq(0)
+      expect(json["customer_id"]).to eq(customer.id)
+      expect(json["user_id"]).to eq(user.id)
+      expect(json["user_name"]).to eq(user.name)
+      expect(json["customer_name"]).to eq(customer.name)
+    end
+
+    context "when required params are missing" do
+      it "returns 422 with errors" do
+        allow_any_instance_of(Opportunity).to receive(:save).and_return(false)
+        allow_any_instance_of(Opportunity).to receive_message_chain(:errors, :full_messages).and_return([ "Customer must exist" ])
+
+        post "/opportunities",
+          params: { title: "New Opportunity" }.to_json,
+          headers: { "Accept" => "application/json", "Content-Type" => "application/json" }
+
+        expect(response).to have_http_status(:unprocessable_entity)
+
+        json = JSON.parse(response.body)
+        expect(json["errors"]).to be_an(Array)
+      end
+    end
+  end
 end
