@@ -189,10 +189,62 @@ RSpec.describe "OpportunitiesController", type: :request do
           params: { title: "New Opportunity" }.to_json,
           headers: { "Accept" => "application/json", "Content-Type" => "application/json" }
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
 
         json = JSON.parse(response.body)
         expect(json["errors"]).to be_an(Array)
+      end
+    end
+  end
+
+  describe "PATCH /opportunities/:id" do
+    let!(:user) { create(:user) }
+    let!(:customer) { create(:customer, user: user) }
+    let!(:opportunity) { create(:opportunity, customer: customer, user: user, title: "Original Title", amount: 5000.00) }
+
+    before { sign_in user }
+
+    it "updates the opportunity and returns the serialized response with OpportunityElementResource" do
+      patch "/opportunities/#{opportunity.id}",
+        params: { title: "Updated Title", amount: 7500.00 }.to_json,
+        headers: { "Accept" => "application/json", "Content-Type" => "application/json" }
+
+      expect(response).to have_http_status(:ok)
+
+      json = JSON.parse(response.body)
+
+      expect(json["id"]).to eq(opportunity.id)
+      expect(json["title"]).to eq("Updated Title")
+      expect(json["amount"]).to eq("7500.0")
+
+      opportunity.reload
+      expect(opportunity.title).to eq("Updated Title")
+      expect(opportunity.amount).to eq(7500.0)
+    end
+
+    context "when update fails" do
+      it "returns 422 with errors" do
+        allow_any_instance_of(Opportunity).to receive(:update).and_return(false)
+        allow_any_instance_of(Opportunity).to receive_message_chain(:errors, :full_messages).and_return([ "Title can't be blank" ])
+
+        patch "/opportunities/#{opportunity.id}",
+          params: { title: "" }.to_json,
+          headers: { "Accept" => "application/json", "Content-Type" => "application/json" }
+
+        expect(response).to have_http_status(:unprocessable_content)
+
+        json = JSON.parse(response.body)
+        expect(json["errors"]).to be_an(Array)
+      end
+    end
+
+    context "when opportunity does not exist" do
+      it "returns 404" do
+        patch "/opportunities/999999",
+          params: { title: "Updated Title" }.to_json,
+          headers: { "Accept" => "application/json", "Content-Type" => "application/json" }
+
+        expect(response).to have_http_status(:not_found)
       end
     end
   end
