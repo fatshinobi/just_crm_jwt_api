@@ -248,4 +248,46 @@ RSpec.describe "OpportunitiesController", type: :request do
       end
     end
   end
+
+  describe "DELETE /opportunities/:id" do
+    let!(:user) { create(:user) }
+    let!(:customer) { create(:customer, user: user) }
+    let!(:opportunity) { create(:opportunity, customer: customer, user: user, title: "Opportunity to delete") }
+
+    before { sign_in user }
+
+    it "soft-deletes the opportunity and returns 204" do
+      delete "/opportunities/#{opportunity.id}",
+        headers: { "Accept" => "application/json", "Content-Type" => "application/json" }
+
+      expect(response).to have_http_status(:no_content)
+
+      opportunity.reload
+      expect(opportunity.deleted_at).not_to be_nil
+    end
+
+    context "when destroy fails" do
+      it "returns 422 with errors" do
+        allow_any_instance_of(Opportunity).to receive(:destroy).and_return(false)
+        allow_any_instance_of(Opportunity).to receive_message_chain(:errors, :full_messages).and_return([ "Cannot delete opportunity" ])
+
+        delete "/opportunities/#{opportunity.id}",
+          headers: { "Accept" => "application/json", "Content-Type" => "application/json" }
+
+        expect(response).to have_http_status(:unprocessable_content)
+
+        json = JSON.parse(response.body)
+        expect(json["errors"]).to be_an(Array)
+      end
+    end
+
+    context "when opportunity does not exist" do
+      it "returns 404" do
+        delete "/opportunities/999999",
+          headers: { "Accept" => "application/json", "Content-Type" => "application/json" }
+
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+  end
 end
