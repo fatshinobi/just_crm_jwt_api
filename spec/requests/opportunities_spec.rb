@@ -290,4 +290,27 @@ RSpec.describe "OpportunitiesController", type: :request do
       end
     end
   end
+
+  describe "GET /opportunities/by_stages" do
+    let!(:user) { create(:user) }
+    let!(:customer) { create(:customer, user: user) }
+    let!(:opportunity_stage_0) { create(:opportunity, customer: customer, user: user, stage: 0) }
+    let!(:opportunity_stage_2_a) { create(:opportunity, customer: customer, user: user, stage: 2) }
+    let!(:opportunity_stage_2_b) { create(:opportunity, customer: customer, user: user, stage: 2) }
+
+    before { sign_in user }
+
+    it "returns counts of opportunities grouped by stage" do
+      get "/opportunities/by_stages",
+        headers: { "Accept" => "application/json", "Content-Type" => "application/json" }
+
+      expect(response).to have_http_status(:ok)
+
+      json = JSON.parse(response.body)
+
+      expect(json).to be_a(Hash)
+      expect(json["0"]).to eq(1)
+      expect(json["2"]).to eq(2)
+    end
+  end
 end
