@@ -78,4 +78,56 @@ RSpec.describe "AppointmentsController", type: :request do
       end
     end
   end
+
+  describe "PATCH /appointments/:id" do
+    let!(:user) { create(:user) }
+    let!(:customer) { create(:customer, user: user) }
+    let!(:appointment) { create(:appointment, customer: customer, user: user, about: "Original about", communication_type: 0) }
+
+    before { sign_in user }
+
+    it "updates the appointment and returns the serialized response with AppointmentResource" do
+      patch "/appointments/#{appointment.id}",
+        params: { about: "Updated about", communication_type: 1 }.to_json,
+        headers: { "Accept" => "application/json", "Content-Type" => "application/json" }
+
+      expect(response).to have_http_status(:ok)
+
+      json = JSON.parse(response.body)
+
+      expect(json["id"]).to eq(appointment.id)
+      expect(json["about"]).to eq("Updated about")
+      expect(json["communication_type"]).to eq(1)
+
+      appointment.reload
+      expect(appointment.about).to eq("Updated about")
+      expect(appointment.communication_type).to eq(1)
+    end
+
+    context "when update fails" do
+      it "returns 422 with errors" do
+        allow_any_instance_of(Appointment).to receive(:update).and_return(false)
+        allow_any_instance_of(Appointment).to receive_message_chain(:errors, :full_messages).and_return([ "About can't be blank" ])
+
+        patch "/appointments/#{appointment.id}",
+          params: { about: "" }.to_json,
+          headers: { "Accept" => "application/json", "Content-Type" => "application/json" }
+
+        expect(response).to have_http_status(:unprocessable_content)
+
+        json = JSON.parse(response.body)
+        expect(json["errors"]).to be_an(Array)
+      end
+    end
+
+    context "when appointment does not exist" do
+      it "returns 404" do
+        patch "/appointments/999999",
+          params: { about: "Updated about" }.to_json,
+          headers: { "Accept" => "application/json", "Content-Type" => "application/json" }
+
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+  end
 end
