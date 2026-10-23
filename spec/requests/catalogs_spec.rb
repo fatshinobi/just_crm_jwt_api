@@ -161,4 +161,45 @@ RSpec.describe "CatalogsController", type: :request do
       expect(client_json["value"]).to eq("Linked Client")
     end
   end
+
+  describe "GET /catalogs/customers_for_client/:client_id" do
+    let!(:user) { create(:user) }
+    let!(:client) { create(:client, user: user, name: "Main Client") }
+    let!(:linked_customer) { create(:customer, user: user, name: "Linked Customer") }
+    let!(:other_customer) { create(:customer, user: user, name: "Other Customer") }
+    let!(:client_customer) { create(:client_customer, client: client, customer: linked_customer) }
+
+    before { sign_in user }
+
+    it "returns only customers linked to the client" do
+      get "/catalogs/customers_for_client/#{client.id}",
+        headers: { "Accept" => "application/json", "Content-Type" => "application/json" }
+
+      expect(response).to have_http_status(:ok)
+
+      json = JSON.parse(response.body)
+
+      expect(json).to be_an(Array)
+      keys = json.map { |c| c["key"] }
+      expect(keys).to include(linked_customer.id)
+      expect(keys).not_to include(other_customer.id)
+
+      values = json.map { |c| c["value"] }
+      expect(values).to include("Linked Customer")
+      expect(values).not_to include("Other Customer")
+    end
+
+    it "returns correct structure with key and value" do
+      get "/catalogs/customers_for_client/#{client.id}",
+        headers: { "Accept" => "application/json", "Content-Type" => "application/json" }
+
+      expect(response).to have_http_status(:ok)
+
+      json = JSON.parse(response.body)
+      customer_json = json.find { |c| c["key"] == linked_customer.id }
+
+      expect(customer_json["key"]).to eq(linked_customer.id)
+      expect(customer_json["value"]).to eq("Linked Customer")
+    end
+  end
 end
