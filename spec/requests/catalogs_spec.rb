@@ -202,4 +202,45 @@ RSpec.describe "CatalogsController", type: :request do
       expect(customer_json["value"]).to eq("Linked Customer")
     end
   end
+
+  describe "GET /catalogs/opportunities_for_customer/:customer_id" do
+    let!(:user) { create(:user) }
+    let!(:customer) { create(:customer, user: user) }
+    let!(:opportunity) { create(:opportunity, customer: customer, user: user, title: "Customer Opportunity") }
+    let!(:other_customer) { create(:customer, user: user, name: "Other Customer") }
+    let!(:other_opportunity) { create(:opportunity, customer: other_customer, user: user, title: "Other Opportunity") }
+
+    before { sign_in user }
+
+    it "returns only opportunities for the specified customer" do
+      get "/catalogs/opportunities_for_customer/#{customer.id}",
+        headers: { "Accept" => "application/json", "Content-Type" => "application/json" }
+
+      expect(response).to have_http_status(:ok)
+
+      json = JSON.parse(response.body)
+
+      expect(json).to be_an(Array)
+      keys = json.map { |o| o["key"] }
+      expect(keys).to include(opportunity.id)
+      expect(keys).not_to include(other_opportunity.id)
+
+      values = json.map { |o| o["value"] }
+      expect(values).to include("Customer Opportunity")
+      expect(values).not_to include("Other Opportunity")
+    end
+
+    it "returns correct structure with key and value" do
+      get "/catalogs/opportunities_for_customer/#{customer.id}",
+        headers: { "Accept" => "application/json", "Content-Type" => "application/json" }
+
+      expect(response).to have_http_status(:ok)
+
+      json = JSON.parse(response.body)
+      opp_json = json.find { |o| o["key"] == opportunity.id }
+
+      expect(opp_json["key"]).to eq(opportunity.id)
+      expect(opp_json["value"]).to eq("Customer Opportunity")
+    end
+  end
 end
