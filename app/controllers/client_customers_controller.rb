@@ -7,7 +7,7 @@ class ClientCustomersController < ApplicationController
       save_role
       render json: ClientCustomerResource.new(client_customer), status: :created
     else
-      render json: { errors: client.errors.full_messages }, status: :unprocessable_entity
+      render json: { errors: client_customer.errors.full_messages }, status: :unprocessable_entity
     end
   end
 
@@ -17,7 +17,7 @@ class ClientCustomersController < ApplicationController
       save_role
       render json: ClientCustomerResource.new(@client_customer), status: :ok
     else
-      render json: { errors: client.errors.full_messages }, status: :unprocessable_entity
+      render json: { errors: client_customer.errors.full_messages }, status: :unprocessable_entity
     end
   end
 
