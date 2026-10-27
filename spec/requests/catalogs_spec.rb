@@ -326,4 +326,41 @@ RSpec.describe "CatalogsController", type: :request do
       expect(opp_json["value"]).to eq("Matched Opportunity")
     end
   end
+
+  describe "GET /catalogs/customers" do
+    let!(:user) { create(:user, email: "cust_catalog@example.com") }
+    let!(:customer1) { create(:customer, user: user, name: "Customer One") }
+    let!(:customer2) { create(:customer, user: user, name: "Customer Two") }
+
+    before { sign_in user }
+
+    it "returns all customers as key-value pairs" do
+      get "/catalogs/customers",
+        headers: { "Accept" => "application/json", "Content-Type" => "application/json" }
+
+      expect(response).to have_http_status(:ok)
+
+      json = JSON.parse(response.body)
+
+      expect(json).to be_an(Array)
+      keys = json.map { |c| c["key"] }
+      expect(keys).to include(customer1.id, customer2.id)
+
+      values = json.map { |c| c["value"] }
+      expect(values).to include("Customer One", "Customer Two")
+    end
+
+    it "returns correct structure with key and value" do
+      get "/catalogs/customers",
+        headers: { "Accept" => "application/json", "Content-Type" => "application/json" }
+
+      expect(response).to have_http_status(:ok)
+
+      json = JSON.parse(response.body)
+      cust_json = json.find { |c| c["key"] == customer1.id }
+
+      expect(cust_json["key"]).to eq(customer1.id)
+      expect(cust_json["value"]).to eq("Customer One")
+    end
+  end
 end
