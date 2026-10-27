@@ -22,6 +22,25 @@ RSpec.describe "ClientCustomersController", type: :request do
       expect(json["role"]).to eq("Manager")
     end
 
+    it "creates a Role when role is provided" do
+      expect {
+        post "/client_customers",
+          params: { client_id: client.id, customer_id: customer.id, role: "Manager" }.to_json,
+          headers: { "Accept" => "application/json", "Content-Type" => "application/json" }
+      }.to change(Role, :count).by(1)
+
+      new_role = Role.find_by(name: "Manager")
+      expect(new_role).to be_present
+    end
+
+    it "does not create a Role when role is not provided" do
+      expect {
+        post "/client_customers",
+          params: { client_id: client.id, customer_id: customer.id }.to_json,
+          headers: { "Accept" => "application/json", "Content-Type" => "application/json" }
+      }.not_to change(Role, :count)
+    end
+
     context "when required params are missing" do
       it "returns 422 with errors" do
         post "/client_customers",
