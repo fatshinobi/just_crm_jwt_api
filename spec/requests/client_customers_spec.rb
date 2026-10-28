@@ -99,4 +99,38 @@ RSpec.describe "ClientCustomersController", type: :request do
       end
     end
   end
+
+  describe "GET /client_customers/:id" do
+    let!(:user) { create(:user, email: "cc_show@example.com") }
+    let!(:client) { create(:client, user: user, name: "Test Client") }
+    let!(:customer) { create(:customer, user: user, name: "Test Customer") }
+    let!(:client_customer) { create(:client_customer, client: client, customer: customer, role: "Manager") }
+
+    before { sign_in user }
+
+    it "returns the client-customer link serialized with ClientCustomerResource" do
+      get "/client_customers/#{client_customer.id}",
+        headers: { "Accept" => "application/json", "Content-Type" => "application/json" }
+
+      expect(response).to have_http_status(:ok)
+
+      json = JSON.parse(response.body)
+
+      expect(json["id"]).to eq(client_customer.id)
+      expect(json["client_id"]).to eq(client.id)
+      expect(json["customer_id"]).to eq(customer.id)
+      expect(json["role"]).to eq("Manager")
+      expect(json["client_name"]).to eq("Test Client")
+      expect(json["customer_name"]).to eq("Test Customer")
+    end
+
+    context "when client_customer does not exist" do
+      it "returns 404" do
+        get "/client_customers/999999",
+          headers: { "Accept" => "application/json", "Content-Type" => "application/json" }
+
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+  end
 end
