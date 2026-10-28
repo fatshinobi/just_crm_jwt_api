@@ -54,4 +54,49 @@ RSpec.describe "ClientCustomersController", type: :request do
       end
     end
   end
+
+  describe "PATCH /client_customers/:id" do
+    let!(:user) { create(:user, email: "cc_update@example.com") }
+    let!(:client) { create(:client, user: user, name: "Test Client") }
+    let!(:customer) { create(:customer, user: user, name: "Test Customer") }
+    let!(:client_customer) { create(:client_customer, client: client, customer: customer, role: "Manager") }
+
+    before { sign_in user }
+
+    it "updates the role and returns the serialized response with ClientCustomerResource" do
+      patch "/client_customers/#{client_customer.id}",
+        params: { role: "Admin" }.to_json,
+        headers: { "Accept" => "application/json", "Content-Type" => "application/json" }
+
+      expect(response).to have_http_status(:ok)
+
+      json = JSON.parse(response.body)
+      expect(json["id"]).to eq(client_customer.id)
+      expect(json["role"]).to eq("Admin")
+
+      client_customer.reload
+      expect(client_customer.role).to eq("Admin")
+    end
+
+    it "creates a Role when a new role is provided" do
+      expect {
+        patch "/client_customers/#{client_customer.id}",
+          params: { role: "Supervisor" }.to_json,
+          headers: { "Accept" => "application/json", "Content-Type" => "application/json" }
+      }.to change(Role, :count).by(1)
+
+      new_role = Role.find_by(name: "Supervisor")
+      expect(new_role).to be_present
+    end
+
+    context "when client_customer does not exist" do
+      it "returns 404" do
+        patch "/client_customers/999999",
+          params: { role: "Admin" }.to_json,
+          headers: { "Accept" => "application/json", "Content-Type" => "application/json" }
+
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+  end
 end
