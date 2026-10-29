@@ -133,4 +133,31 @@ RSpec.describe "ClientCustomersController", type: :request do
       end
     end
   end
+
+  describe "DELETE /client_customers/:id" do
+    let!(:user) { create(:user, email: "cc_destroy@example.com") }
+    let!(:client) { create(:client, user: user, name: "Test Client") }
+    let!(:customer) { create(:customer, user: user, name: "Test Customer") }
+    let!(:client_customer) { create(:client_customer, client: client, customer: customer, role: "Manager") }
+
+    before { sign_in user }
+
+    it "deletes the client-customer link and returns 204" do
+      expect {
+        delete "/client_customers/#{client_customer.id}",
+          headers: { "Accept" => "application/json", "Content-Type" => "application/json" }
+      }.to change(ClientCustomer, :count).by(-1)
+
+      expect(response).to have_http_status(:no_content)
+    end
+
+    context "when client_customer does not exist" do
+      it "returns 404" do
+        delete "/client_customers/999999",
+          headers: { "Accept" => "application/json", "Content-Type" => "application/json" }
+
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+  end
 end
