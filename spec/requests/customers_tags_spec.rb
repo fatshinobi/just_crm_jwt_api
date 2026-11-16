@@ -39,4 +39,60 @@ RSpec.describe "Customers::TagsController", type: :request do
       expect(json).to be_empty
     end
   end
+
+  describe "POST /customers/:id/tags" do
+    let!(:user) { create(:user, email: "cut_create@example.com") }
+    let!(:customer) { create(:customer, user: user, name: "Test Customer") }
+
+    before { sign_in user }
+
+    it "creates tags and returns 201" do
+      expect {
+        post "/customers/#{customer.id}/tags",
+          params: { tags: "VIP,Prospect" }.to_json,
+          headers: { "Accept" => "application/json", "Content-Type" => "application/json" }
+
+        expect(response).to have_http_status(:created)
+      }.to change(Tag, :count).by(2)
+
+      expect(customer.tags.pluck(:name)).to include("VIP", "Prospect")
+    end
+
+    it "replaces existing tags" do
+      existing_tag = create(:tag, name: "Old Tag", tag_type: Tag::CUSTOMER_STATUS)
+      create(:customer_tag, customer: customer, tag: existing_tag)
+
+      post "/customers/#{customer.id}/tags",
+        params: { tags: "VIP" }.to_json,
+        headers: { "Accept" => "application/json", "Content-Type" => "application/json" }
+
+      expect(response).to have_http_status(:created)
+
+      expect(customer.tags.pluck(:name)).to include("VIP")
+      expect(customer.tags.pluck(:name)).not_to include("Old Tag")
+      expect(Tag.exists?(existing_tag.id)).to be(true)
+    end
+
+    it "uses find_or_create_by so tags are not duplicated" do
+      existing_tag = create(:tag, name: "VIP", tag_type: Tag::CUSTOMER_STATUS)
+
+      expect {
+        post "/customers/#{customer.id}/tags",
+          params: { tags: "VIP" }.to_json,
+          headers: { "Accept" => "application/json", "Content-Type" => "application/json" }
+      }.not_to change(Tag, :count)
+
+      expect(customer.tags.pluck(:name)).to include("VIP")
+    end
+
+    it "skips blank tags" do
+      expect {
+        post "/customers/#{customer.id}/tags",
+          params: { tags: "VIP,   ,, Prospect" }.to_json,
+          headers: { "Accept" => "application/json", "Content-Type" => "application/json" }
+
+        expect(response).to have_http_status(:created)
+      }.to change(Tag, :count).by(2)
+    end
+  end
 end
