@@ -41,4 +41,62 @@ RSpec.describe "Opportunities::TagsController", type: :request do
       expect(json).to be_empty
     end
   end
+
+  describe "POST /opportunities/:id/tags" do
+    let!(:user) { create(:user, email: "ot_create@example.com") }
+    let!(:customer) { create(:customer, user: user, name: "Test Customer") }
+    let!(:client) { create(:client, user: user, name: "Test Client") }
+    let!(:opportunity) { create(:opportunity, customer: customer, client: client, user: user, title: "Test Opportunity") }
+
+    before { sign_in user }
+
+    it "creates tags and returns 201" do
+      expect {
+        post "/opportunities/#{opportunity.id}/tags",
+          params: { tags: "Hot,Cold" }.to_json,
+          headers: { "Accept" => "application/json", "Content-Type" => "application/json" }
+
+        expect(response).to have_http_status(:created)
+      }.to change(Tag, :count).by(2)
+
+      expect(opportunity.tags.pluck(:name)).to include("Hot", "Cold")
+    end
+
+    it "replaces existing tags" do
+      existing_tag = create(:tag, name: "Old Tag", tag_type: Tag::OPPORTUNITY_STATUS)
+      create(:opportunity_tag, opportunity: opportunity, tag: existing_tag)
+
+      post "/opportunities/#{opportunity.id}/tags",
+        params: { tags: "Hot" }.to_json,
+        headers: { "Accept" => "application/json", "Content-Type" => "application/json" }
+
+      expect(response).to have_http_status(:created)
+
+      expect(opportunity.tags.pluck(:name)).to include("Hot")
+      expect(opportunity.tags.pluck(:name)).not_to include("Old Tag")
+      expect(Tag.exists?(existing_tag.id)).to be(true)
+    end
+
+    it "uses find_or_create_by so tags are not duplicated" do
+      existing_tag = create(:tag, name: "Hot", tag_type: Tag::OPPORTUNITY_STATUS)
+
+      expect {
+        post "/opportunities/#{opportunity.id}/tags",
+          params: { tags: "Hot" }.to_json,
+          headers: { "Accept" => "application/json", "Content-Type" => "application/json" }
+      }.not_to change(Tag, :count)
+
+      expect(opportunity.tags.pluck(:name)).to include("Hot")
+    end
+
+    it "skips blank tags" do
+      expect {
+        post "/opportunities/#{opportunity.id}/tags",
+          params: { tags: "Hot,   ,, Cold" }.to_json,
+          headers: { "Accept" => "application/json", "Content-Type" => "application/json" }
+
+        expect(response).to have_http_status(:created)
+      }.to change(Tag, :count).by(2)
+    end
+  end
 end
